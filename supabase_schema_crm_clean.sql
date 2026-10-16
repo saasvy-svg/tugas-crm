@@ -31,8 +31,22 @@ CREATE TABLE IF NOT EXISTS organizations (
     module_physical         BOOLEAN     DEFAULT false,
     custom_asset_categories TEXT[]      DEFAULT ARRAY['Logo & Branding', 'Font & Tipografi', 'Desain Siap Cetak', 'Dokumen & Copywriting', 'Gambar Konten Web/App', 'Lainnya']::TEXT[],
     monthly_sales_target    NUMERIC     DEFAULT 0,
+    bank_name               TEXT        DEFAULT NULL,
+    bank_account_number     TEXT        DEFAULT NULL,
+    bank_account_name       TEXT        DEFAULT NULL,
+    company_address         TEXT        DEFAULT NULL,
+    company_email           TEXT        DEFAULT NULL,
     created_at              TIMESTAMPTZ DEFAULT now() NOT NULL
 );
+
+-- Pastikan kolom baru selalu ada jika tabel organizations sudah terlanjur dibuat sebelumnya
+ALTER TABLE organizations
+    ADD COLUMN IF NOT EXISTS monthly_sales_target NUMERIC DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS bank_name TEXT DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS bank_account_number TEXT DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS bank_account_name TEXT DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS company_address TEXT DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS company_email TEXT DEFAULT NULL;
 
 -- ------------------------------------------------------------------------------
 -- 3. TABEL PROFILES (Pengguna: Admin Agensi, Staff, & Klien)
