@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Plus, X, Globe, Package, Sparkles } from 'lucide-react'
 import { createClientProject } from '@/app/(workspace)/dashboard/actions'
 import { createPhysicalOrder } from '@/app/(workspace)/dashboard/production/actions'
@@ -30,9 +30,11 @@ export default function CreateHybridProjectModal({
   const [orderType, setOrderType] = useState<'DIGITAL' | 'PHYSICAL'>('DIGITAL')
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const isSubmittingRef = useRef(false)
 
   async function handleDigitalSubmit(formData: FormData) {
-    if (loading) return
+    if (isSubmittingRef.current || loading) return
+    isSubmittingRef.current = true
     setLoading(true)
     setErrorMsg('')
     
@@ -52,11 +54,13 @@ export default function CreateHybridProjectModal({
       toast.error(msg)
     } finally {
       setLoading(false)
+      isSubmittingRef.current = false
     }
   }
 
   async function handlePhysicalSubmit(formData: FormData) {
-    if (loading) return
+    if (isSubmittingRef.current || loading) return
+    isSubmittingRef.current = true
     setLoading(true)
     setErrorMsg('')
 
@@ -77,6 +81,7 @@ export default function CreateHybridProjectModal({
       toast.error(msg)
     } finally {
       setLoading(false)
+      isSubmittingRef.current = false
     }
   }
 
@@ -207,7 +212,13 @@ export default function CreateHybridProjectModal({
                   <button 
                     disabled={loading} 
                     type="submit" 
-                    className="w-full bg-[#2563EB] text-white font-bold py-3.5 rounded-[12px] hover:bg-[#1D4ED8] transition-all shadow-md disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2"
+                    onClick={(e) => {
+                      if (loading || isSubmittingRef.current) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                      }
+                    }}
+                    className="w-full bg-[#2563EB] text-white font-bold py-3.5 rounded-[12px] hover:bg-[#1D4ED8] transition-all shadow-md disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {loading ? (
                       <>
@@ -242,6 +253,24 @@ export default function CreateHybridProjectModal({
                     placeholder="Contoh: Cetak 100 Kaos Polo Bordir + Spanduk" 
                     className="w-full px-4 py-3 rounded-[12px] bg-[#F8F9FA] border border-black/10 text-sm focus:outline-none focus:border-orange-500 transition-colors" 
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[#4B5563] mb-1.5">Tipe Jasa Layanan Fisik</label>
+                  <select name="service_type" className="w-full px-4 py-3 rounded-[12px] bg-[#F8F9FA] border border-black/10 text-sm focus:outline-none focus:border-orange-500 transition-colors font-medium">
+                    <option value="">-- Pilih Tipe Layanan (Atau ikuti Jenis Produk) --</option>
+                    {services.map(s => (
+                      <option key={s.id} value={s.name}>{s.name}</option>
+                    ))}
+                    {services.length === 0 && (
+                      <>
+                        <option value="Merchandise & Kaos">Merchandise & Kaos</option>
+                        <option value="Cetak Banner / Spanduk">Cetak Banner / Spanduk</option>
+                        <option value="Packaging & Box">Packaging & Box</option>
+                        <option value="Percetakan & Cetak Dokumen">Percetakan & Cetak Dokumen</option>
+                      </>
+                    )}
+                  </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -291,14 +320,7 @@ export default function CreateHybridProjectModal({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-[#4B5563] mb-1.5">Total Harga Pesanan (Rp) *</label>
-                    <input 
-                      type="number" 
-                      name="total_price" 
-                      required 
-                      placeholder="Rp 0" 
-                      className="w-full px-4 py-3 rounded-[12px] bg-[#F8F9FA] border border-black/10 text-sm focus:outline-none focus:border-orange-500 transition-colors font-bold" 
-                    />
+                    <CurrencyInput name="total_price" label="Total Harga Pesanan (Rp) *" />
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-[#4B5563] mb-1.5">Deadline Selesai Produksi</label>
@@ -329,7 +351,13 @@ export default function CreateHybridProjectModal({
                   <button 
                     disabled={loading} 
                     type="submit" 
-                    className="w-full bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold py-3.5 rounded-[12px] hover:opacity-95 transition-all shadow-md disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2"
+                    onClick={(e) => {
+                      if (loading || isSubmittingRef.current) {
+                        e.preventDefault()
+                        e.stopPropagation()
+                      }
+                    }}
+                    className="w-full bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold py-3.5 rounded-[12px] hover:opacity-95 transition-all shadow-md disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {loading ? (
                       <>

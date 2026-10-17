@@ -19,10 +19,10 @@ export async function createPhysicalOrder(formData: FormData) {
 
   const clientId = formData.get('client_id') as string
   const title = formData.get('title') as string
-  const serviceType = formData.get('service_type') as string
-  const totalPrice = Number(formData.get('total_price')) || 0
-  
-  const itemType = formData.get('item_type') as string
+  const rawServiceType = formData.get('service_type') as string
+  const itemType = (formData.get('item_type') as string) || ''
+  const serviceType = rawServiceType?.trim() || itemType?.trim() || 'Produksi Fisik'
+  const totalPrice = Number(formData.get('total_price')) || Number(formData.get('totalPrice')) || 0
   const quantity = Number(formData.get('quantity')) || 1
   const materialNotes = formData.get('material_notes') as string
   const sizeNotes = formData.get('size_notes') as string

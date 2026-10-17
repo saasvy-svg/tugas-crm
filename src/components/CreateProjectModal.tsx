@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Plus, X } from 'lucide-react'
 import { createClientProject } from '@/app/(workspace)/dashboard/actions'
 import CurrencyInput from '@/components/CurrencyInput'
@@ -23,9 +23,11 @@ export default function CreateProjectModal({ clients, services = [] }: { clients
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
+  const isSubmittingRef = useRef(false)
 
   async function handleSubmit(formData: FormData) {
-    if (loading) return
+    if (isSubmittingRef.current || loading) return
+    isSubmittingRef.current = true
     setLoading(true)
     setErrorMsg('')
     
@@ -41,6 +43,7 @@ export default function CreateProjectModal({ clients, services = [] }: { clients
       setErrorMsg(err?.message || 'Terjadi kesalahan sistem.')
     } finally {
       setLoading(false)
+      isSubmittingRef.current = false
     }
   }
 
@@ -109,7 +112,17 @@ export default function CreateProjectModal({ clients, services = [] }: { clients
               )}
 
               <div className="pt-2">
-                <button disabled={loading} type="submit" className="w-full bg-[#2563EB] text-white font-bold py-3.5 rounded-[12px] hover:bg-[#1D4ED8] transition-all shadow-md disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                <button 
+                  disabled={loading} 
+                  type="submit" 
+                  onClick={(e) => {
+                    if (loading || isSubmittingRef.current) {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }
+                  }}
+                  className="w-full bg-[#2563EB] text-white font-bold py-3.5 rounded-[12px] hover:bg-[#1D4ED8] transition-all shadow-md disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                >
                   {loading ? (
                     <>
                       <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

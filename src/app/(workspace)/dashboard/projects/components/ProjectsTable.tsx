@@ -111,8 +111,12 @@ export default function ProjectsTable({ projects, pendingRevisionsCount = {}, pa
                   )}
                 </td>
                 <td className="py-4 px-4 relative z-10">
-                  <span className="px-2.5 py-1 bg-[#EFF6FF] text-[#2563EB] text-[10px] font-bold uppercase tracking-wider rounded-md whitespace-nowrap inline-block">
-                    {proj.service_type}
+                  <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md whitespace-nowrap inline-block ${
+                    proj.project_category === 'PHYSICAL' 
+                      ? 'bg-orange-50 text-orange-600 border border-orange-100' 
+                      : 'bg-[#EFF6FF] text-[#2563EB]'
+                  }`}>
+                    {proj.service_type || (proj.project_category === 'PHYSICAL' ? 'PRODUKSI FISIK' : 'LAYANAN DIGITAL')}
                   </span>
                 </td>
                 {(userRole === 'staff_cs' || userRole === 'staff_finance' || userRole === 'admin' || userRole === 'super_admin' || userRole === 'staff_ops') && (
